@@ -1,0 +1,9 @@
+[core]
+	bare = true
+	repositoryformatversion = 0
+	filemode = false
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = ssh://tfs2018.e-future.com.cn:22/T2019ZT/KA.201902.WMZT/_git/order-pick
+	fetch = +refs/heads/*:refs/remotes/origin/*
