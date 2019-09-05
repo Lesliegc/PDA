@@ -1,3 +1,6 @@
+group 'com.apptreesoftware.barcodescan'
+version '1.0-SNAPSHOT'
+
 buildscript {
     repositories {
         google()
@@ -5,25 +8,42 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
     }
 }
 
-allprojects {
+rootProject.allprojects {
     repositories {
-        google()
         jcenter()
+        google()
     }
 }
 
-rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 28
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.20'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.13'
+    api 'com.google.android.material:material:1.0.0'
 }

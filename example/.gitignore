@@ -2,9 +2,9 @@
 .atom/
 .idea
 .packages
-.dart_tool/
 .pub/
 build/
 ios/.generated/
 packages
 pubspec.lock
+.flutter-plugins
