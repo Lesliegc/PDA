@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:pda_pick_app/utils/goodlist.dart'
     show Detail, GoodList, GoodListBean;
 
@@ -227,29 +226,6 @@ class _DetailState extends State<Picking> {
                   ),
                 ],
               ),
-              new Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  new Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      new Text(
-                        "等待扫描...",
-                        style:
-                            TextStyle(color: Color(0xFF121917), fontSize: 14.0),
-                      ),
-                      Text(barcode),
-                      MaterialButton(
-                        onPressed: scan,
-                        child: Text("Scan"),
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -257,23 +233,4 @@ class _DetailState extends State<Picking> {
     ));
   }
 
-  Future scan() async {
-    try {
-      String barcode = await scanner.scan();
-      setState(() => this.barcode = barcode);
-    } on Exception catch (e) {
-      if (e == scanner.CameraAccessDenied) {
-        setState(() {
-          this.barcode = 'The user did not grant the camera permission!';
-        });
-      } else {
-        setState(() => this.barcode = 'Unknown error: $e');
-      }
-    } on FormatException {
-      setState(() => this.barcode =
-          'null (User returned using the "back"-button before scanning anything. Result)');
-    } catch (e) {
-      setState(() => this.barcode = 'Unknown error: $e');
-    }
-  }
 }

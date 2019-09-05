@@ -50,6 +50,7 @@ class _PackTestRouteState extends State<PackTestRoute> {
                       textColor: Colors.white,
                       onPressed: () {
                         // 点击确认按钮
+       
 
                         if (phoneEditingController.text == '') {
                           showDialog(
@@ -73,4 +74,6 @@ class _PackTestRouteState extends State<PackTestRoute> {
       resizeToAvoidBottomPadding: false, //输入框抵住键盘
     );
   }
+
+
 }
