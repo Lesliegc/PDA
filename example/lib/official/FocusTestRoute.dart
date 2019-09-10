@@ -26,7 +26,7 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("复验"),
+        title: Text("验货"),
         centerTitle: true,
       ),
       body: Container(

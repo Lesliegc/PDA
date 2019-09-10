@@ -107,7 +107,7 @@ class _TapboxCState extends State<TapboxC> {
                               builder: (context) => new FocusTestRoute()),
                         );
                       })),
-              Text("复验",
+              Text("验货",
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.white,
