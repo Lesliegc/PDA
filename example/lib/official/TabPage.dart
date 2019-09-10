@@ -37,6 +37,7 @@ class _SnackBarPageState extends State<SnackBarPage> {
 
   @override
   void initState() {
+    this.getData();
     sort = false;
     selectedShops = [];
     super.initState();
@@ -116,7 +117,6 @@ class _SnackBarPageState extends State<SnackBarPage> {
   }
 
   @override
-
   Widget build(BuildContext context) {
     print('进来');
     return Container(
