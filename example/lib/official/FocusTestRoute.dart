@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'dart:convert';
+import 'dart:convert';
 import 'dart:async';
-// import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +16,7 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
   TextEditingController phoneEditingController = new TextEditingController();
   FocusNode focusNode2 = new FocusNode();
   String barcode = "";
+  String msg = "";
 
   @override
   initState() {
@@ -36,9 +37,11 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
         child: Column(
           children: <Widget>[
             new Container(
-              child:
-                  new MaterialButton(onPressed: scan, child: new Text("Scan")),
-              padding: const EdgeInsets.all(8.0),
+              child: new MaterialButton(
+                  onPressed: scan,
+                  color: Colors.amberAccent,
+                  padding: const EdgeInsets.all(5.0),
+                  child: new Text("订单扫码")),
             ),
             new Text(barcode),
             TextField(
@@ -62,7 +65,6 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
                       textColor: Colors.white,
                       onPressed: () {
                         // 点击确认按钮
-
                         if (phoneEditingController.text == '') {
                           showDialog(
                               context: context,
@@ -70,9 +72,7 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
                                   new AlertDialog(title: new Text("请输入订单号")));
                           return;
                         }
-
-                        // 将输入的内容返回
-                        Navigator.pop(context, phoneEditingController.text);
+                        inspection();
                       },
                     ),
                   ),
@@ -89,8 +89,8 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
   Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();
-      setState(() => this.barcode = barcode);
-      print(barcode);
+      setState(() => this.phoneEditingController.text = barcode);
+      print(phoneEditingController.text);
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
@@ -104,6 +104,39 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
           'null (User returned using the "back"-button before scanning anything. Result)');
     } catch (e) {
       setState(() => this.barcode = 'Unknown error: $e');
+    }
+  }
+
+  Future inspection() async {
+    var data = {
+      "loginid": "shgbpdatest",
+      "shopid": 114,
+      "taskid": phoneEditingController.text
+    };
+    try {
+      Dio dio = new Dio();
+      final String _url =
+          'http://172.17.10.235:8080/order-center/ui/PDA/getDabaoTaskInfo.action';
+      Response response;
+        print(data);
+      response = await dio.post(_url, queryParameters: data);
+      print(response);
+      var successful = json.decode(response.toString());
+      setState(() {
+        msg = successful['msg'];
+      });
+       if (successful['code'] == '0') {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) =>
+              new AlertDialog(title: new Text(msg)));
+
+              return;
+       }else{
+         
+       }
+    } catch (e) {
+      print(e);
     }
   }
 }

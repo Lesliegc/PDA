@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async';
-import 'package:dio/dio.dart';
+import 'package:barcode_scan_example/utils/httputil.dart';
+import 'package:barcode_scan_example/common/api.dart';
 import 'package:barcode_scan_example/utils/goodlist.dart';
+import 'package:barcode_scan_example/View/Order.dart';
 
 class TabePage extends StatelessWidget {
   @override
@@ -13,9 +15,11 @@ class TabePage extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: Text("拣货"),
-            
-            onPressed: (){
-              print('search');
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => OrderTest(id: "99161025395685")));
             },
           )
         ],
@@ -32,39 +36,50 @@ class SnackBarPage extends StatefulWidget {
 }
 
 class _SnackBarPageState extends State<SnackBarPage> {
-  List<Shop> selectedShops;
   bool sort;
-
+  List<ProjectData> _datas = new List(); //一级分类集合
+  List<ProjectData> selectedUsers;
+  
   @override
   void initState() {
-    this.getData();
+    getData();
     sort = false;
-    selectedShops = [];
+    selectedUsers = [];
     super.initState();
   }
 
-  var mlist = [];
-  //选中单个
-  void selectRow(int index, bool isSelected) {
-    mlist = mlist[index];
+  onSelectedRow(bool selected, item) async {
+    setState(() {
+      if (selected) {
+        selectedUsers.add(item);
+        selectedUsers.map((v) =>
+        print(v.taskid)
+        ).toList();
+        
+      } else {
+      selectedUsers.remove(item);
+      }
+    });
   }
 
+
+
   Future getData() async {
-    try {
-      Dio dio = new Dio();
-      final String _url =
-          'http://172.17.8.193:8080/order-center/ui/PDA/getMyJianHuoTask.action?loginid=shgbpdatest&shopid=114';
-      Response response;
-      response = await dio.post(_url);
+    try{
+      var data = {"loginid": "shgbpdatest", "shopid": 114};
 
-      var articleMap = json.decode(response.toString())['data'];
+      var response = await HttpUtil().post(Api.Task, data: data);
 
+      Map taskMap = json.decode(response.toString());
+      var projectEntity = new ProjectEntity.fromJson(taskMap);
       setState(() {
-        mlist = articleMap;
+        if(_datas.length != null)_datas=projectEntity.data;
       });
     } catch (e) {
       print(e);
     }
+
+  
   }
 
   SingleChildScrollView dataBody() {
@@ -88,27 +103,26 @@ class _SnackBarPageState extends State<SnackBarPage> {
                 tooltip: "数量",
               ),
             ],
-            rows: mlist.map((item) {
+            rows: _datas.map((item) {
               return DataRow(
-                  selected: mlist.contains(item),
-                  onSelectChanged: (b) {
-                    print("Onselect");
-                    // onSelectedRow(b, item);
-                  },
+                  selected: selectedUsers.contains(item),
+                    onSelectChanged: (bool selected) {
+                   onSelectedRow(selected, item);
+            },
                   cells: [
                     DataCell(
-                      Text(item['taskid'].toString(),
+                      Text(item.taskid.toString(),
                           style: new TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16.0)),
                       onTap: () {},
                     ),
                     DataCell(
-                      Text(item['items'].toString(),
+                      Text(item.items.toString(),
                           style: new TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16.0)),
                     ),
                     DataCell(
-                      Text(item['amount'].toString()),
+                      Text(item.amount.toString()),
                     ),
                   ]);
             }).toList(),
@@ -118,7 +132,6 @@ class _SnackBarPageState extends State<SnackBarPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('进来');
     return Container(
         child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -126,7 +139,7 @@ class _SnackBarPageState extends State<SnackBarPage> {
       verticalDirection: VerticalDirection.down,
       children: <Widget>[
         Expanded(
-          flex: 4,
+          flex: 5,
           child: dataBody(),
         ),
         Expanded(
@@ -142,17 +155,17 @@ class _SnackBarPageState extends State<SnackBarPage> {
             Padding(
               padding: EdgeInsets.all(20.0),
               child: OutlineButton(
-                child: Text('共有${mlist.length}个拣货任务，已选中2个拣货任务'),
-                onPressed: () {},
+                child: Text('共有${_datas.length}个拣货任务'),
+                onPressed: null,
               ),
             ),
             Padding(
               padding: EdgeInsets.all(20.0),
               child: OutlineButton(
                 child: Text('刷 新'),
-                onPressed:() {
-                        getData();
-                      },
+                onPressed: () {
+                  getData();
+                },
               ),
             ),
           ],
